@@ -1,34 +1,39 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const features = [
+    'Add destinations with a name and country',
+    'Edit or delete saved destinations',
+    'Rate destinations from 1 to 5 stars',
+    'Add personal notes to each destination',
+    'Search and filter your wishlist',
+  ]
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
+    <div className="container">
+      <header className="hero">
+        <div className="hero-icon">✈️</div>
+        <h1>Travel Wishlist</h1>
+        <p className="tagline">
+          Save, organize, and dream about the destinations you want to explore.
         </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+      </header>
+
+      <main>
+        <section className="features">
+          <h2>Planned Features</h2>
+          <ul>
+            {features.map((feature, index) => (
+              <li key={index}>{feature}</li>
+            ))}
+          </ul>
+        </section>
+
+        <section className="status">
+          <p>🚧 This app is currently under development.</p>
+        </section>
+      </main>
+    </div>
   )
 }
 
