@@ -1,16 +1,25 @@
-# React + Vite
+# Travel Wishlist
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Project Description
 
-Currently, two official plugins are available:
+Travel Wishlist is a web application that allows users to save and organize travel destinations they want to visit. Users will be able to add destinations, rate them, include notes, and manage their travel ideas in one place.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Planned Features
 
-## React Compiler
+1. Add destinations with name, region, rating, and notes
+2. Edit saved destinations
+3. Delete destinations from the wishlist
+4. Search destinations by name
+5. Persistent storage using localStorage
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Tech Stack
 
-## Expanding the ESLint configuration
+- React
+- Vite
+- JavaScript
+- CSS
+- localStorage (for data persistence)
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Future Improvements
+
+During the mid-term build phase, the app will include full CRUD functionality, responsive UI improvements, and search filtering for saved destinations.
