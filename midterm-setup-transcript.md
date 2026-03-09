@@ -149,6 +149,46 @@ git push
 
 ---
 
+## 8. Project Plan Review
+
+**Prompt:** Before I start building features, review my project plan. Do the planned features meet the requirements for a small CRUD application using localStorage? Is anything missing that would improve usability without adding unnecessary complexity?
+
+**Review:**
+
+### CRUD Coverage
+
+| Operation | Feature | Status |
+|---|---|---|
+| **Create** | Add destinations | ✓ Covered |
+| **Read** | Display destination list | ⚠️ Implied but never stated |
+| **Update** | Edit saved destinations | ✓ Covered |
+| **Delete** | Delete destinations | ✓ Covered |
+| **Persist** | localStorage | ✓ Covered |
+
+The only gap is that **Read is assumed but not defined** — explicitly plan a destination list view as a feature so it's clear how saved data is displayed.
+
+### What's Good
+
+- The data structure already includes `visited`, `rating`, and `notes` — well thought out for a small app
+- Search covers the most common user need without over-engineering
+- Scope is appropriate for a mid-term project
+
+### Small Additions Worth Considering
+
+1. **Mark as visited toggle** — a single boolean flip on a card; the data structure already has `visited: false`, so nearly free to implement
+2. **Empty state message** — show "No destinations yet. Add one!" when the list is empty; one `if` condition, big UX difference
+3. **Delete confirmation** — a simple `window.confirm()` before deleting prevents accidental data loss
+
+### What to Leave Out
+
+- Sorting/filtering beyond search — adds complexity for marginal gain
+- Categories or tags — out of scope for mid-term
+- Any backend or auth — localStorage is the right call here
+
+**Bottom line:** Solid CRUD coverage. Add "display destination list" as an explicit feature, and consider the three small additions above — each under 10 lines of code but make the app feel complete.
+
+---
+
 ## Notes & Lessons
 
 - Always verify the working directory before running `npm create vite`
