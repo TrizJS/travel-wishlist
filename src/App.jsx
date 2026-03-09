@@ -1,40 +1,82 @@
-import './App.css'
+import { useState } from 'react';
+import DestinationForm from './components/DestinationForm';
+import DestinationCard from './components/DestinationCard';
+import SearchBar from './components/SearchBar';
+import { getDestinations, addDestination, updateDestination, deleteDestination } from './utils/storage';
+import './App.css';
 
 function App() {
-  const features = [
-    'Add destinations with a name and country',
-    'Edit or delete saved destinations',
-    'Rate destinations from 1 to 5 stars',
-    'Add personal notes to each destination',
-    'Search and filter your wishlist',
-  ]
+  const [destinations, setDestinations] = useState(() => getDestinations());
+  const [editingDestination, setEditingDestination] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const filteredDestinations = destinations.filter((d) =>
+    d.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const handleAdd = (destination) => {
+    addDestination(destination);
+    setDestinations(getDestinations());
+  };
+
+  const handleUpdate = (destination) => {
+    updateDestination(destination);
+    setDestinations(getDestinations());
+    setEditingDestination(null);
+  };
+
+  const handleDelete = (id) => {
+    deleteDestination(id);
+    setDestinations(getDestinations());
+  };
+
+  const handleFormSubmit = (destination) => {
+    if (editingDestination) {
+      handleUpdate(destination);
+    } else {
+      handleAdd(destination);
+    }
+  };
 
   return (
     <div className="container">
-      <header className="hero">
-        <div className="hero-icon">✈️</div>
-        <h1>Travel Wishlist</h1>
-        <p className="tagline">
-          Save, organize, and dream about the destinations you want to explore.
-        </p>
+      <header className="app-header">
+        <h1>✈️ Travel Wishlist</h1>
+        <p>Save and organize the destinations you want to explore.</p>
       </header>
 
       <main>
-        <section className="features">
-          <h2>Planned Features</h2>
-          <ul>
-            {features.map((feature, index) => (
-              <li key={index}>{feature}</li>
-            ))}
-          </ul>
-        </section>
+        <DestinationForm
+          onSubmit={handleFormSubmit}
+          editingDestination={editingDestination}
+          onCancelEdit={() => setEditingDestination(null)}
+        />
 
-        <section className="status">
-          <p>🚧 This app is currently under development.</p>
+        <SearchBar query={searchQuery} onChange={setSearchQuery} />
+
+        <section className="destination-list">
+          <h2>Your Destinations ({filteredDestinations.length})</h2>
+
+          {destinations.length === 0 ? (
+            <p className="empty-state">No destinations yet. Add one above!</p>
+          ) : filteredDestinations.length === 0 ? (
+            <p className="empty-state">No destinations match "{searchQuery}".</p>
+          ) : (
+            <div className="cards-grid">
+              {filteredDestinations.map((destination) => (
+                <DestinationCard
+                  key={destination.id}
+                  destination={destination}
+                  onEdit={setEditingDestination}
+                  onDelete={handleDelete}
+                />
+              ))}
+            </div>
+          )}
         </section>
       </main>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
