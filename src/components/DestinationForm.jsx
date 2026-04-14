@@ -16,6 +16,7 @@ function DestinationForm({ onSubmit, editingDestination, onCancelEdit }) {
 
   useEffect(() => {
     if (editingDestination) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setForm({
         name: editingDestination.name,
         country: editingDestination.country,

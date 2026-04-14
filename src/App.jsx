@@ -1,33 +1,39 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import DestinationForm from './components/DestinationForm';
 import DestinationCard from './components/DestinationCard';
 import SearchBar from './components/SearchBar';
+import { useAuth } from './context/AuthContext';
 import { getDestinations, addDestination, updateDestination, deleteDestination } from './utils/storage';
 import './App.css';
 
 function App() {
-  const [destinations, setDestinations] = useState(() => getDestinations());
+  const { user, signOut } = useAuth();
+  const [destinations, setDestinations] = useState([]);
   const [editingDestination, setEditingDestination] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
+
+  useEffect(() => {
+    getDestinations().then(setDestinations);
+  }, []);
 
   const filteredDestinations = destinations.filter((d) =>
     d.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const handleAdd = (destination) => {
-    addDestination(destination);
-    setDestinations(getDestinations());
+  const handleAdd = async (destination) => {
+    const created = await addDestination(destination, user.id);
+    setDestinations((prev) => [created, ...prev]);
   };
 
-  const handleUpdate = (destination) => {
-    updateDestination(destination);
-    setDestinations(getDestinations());
+  const handleUpdate = async (destination) => {
+    await updateDestination(destination);
+    setDestinations((prev) => prev.map((d) => (d.id === destination.id ? destination : d)));
     setEditingDestination(null);
   };
 
-  const handleDelete = (id) => {
-    deleteDestination(id);
-    setDestinations(getDestinations());
+  const handleDelete = async (id) => {
+    await deleteDestination(id);
+    setDestinations((prev) => prev.filter((d) => d.id !== id));
   };
 
   const handleFormSubmit = (destination) => {
@@ -43,6 +49,9 @@ function App() {
       <header className="app-header">
         <h1>✈️ Travel Wishlist</h1>
         <p>Save and organize the destinations you want to explore.</p>
+        <button className="btn-cancel" onClick={signOut} style={{ marginTop: '0.75rem' }}>
+          Sign Out
+        </button>
       </header>
 
       <main>
