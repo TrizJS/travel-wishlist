@@ -29,6 +29,14 @@ export const updateDestination = async (destination) => {
   if (error) throw error;
 };
 
+export const toggleVisited = async (id, visited) => {
+  const { error } = await supabase
+    .from('destinations')
+    .update({ visited })
+    .eq('id', id);
+  if (error) throw error;
+};
+
 export const deleteDestination = async (id) => {
   const { error } = await supabase
     .from('destinations')

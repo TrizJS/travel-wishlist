@@ -1,71 +1,112 @@
 # Travel Wishlist
 
-## Project Description
-
-Travel Wishlist is a React web application that allows users to save and organize travel destinations they want to visit. Users can add destinations, rate them, include notes, edit or delete entries, and search their list — all stored locally in the browser using localStorage.
+A personal travel wishlist app built with React and Supabase. Save destinations, track what you want to visit, and mark places as visited — all synced to the cloud with per-user accounts.
 
 ## Features
 
-- Add destinations with name, region/country, category, rating, and notes
-- Edit saved destinations with a pre-filled form
-- Delete destinations with a confirmation prompt
-- Search destinations by name (live filtering)
-- Persistent storage using localStorage — data survives page reloads
-- Responsive layout — grid on desktop, stacked on mobile
-- Empty state messages for no data and no search matches
+- **Auth** — email/password sign up and sign in via Supabase Auth; session persists across page refreshes
+- **Per-user data** — each account sees only its own destinations, enforced by Supabase Row Level Security
+- **Add / Edit / Delete** — full CRUD with inline validation on required fields
+- **Mark as Visited** — toggle visited state per destination, reflected instantly in the UI
+- **Duplicate detection** — prevents adding the same destination (name + country) twice
+- **Search** — live filter by destination name
+- **Loading skeletons** — shimmer placeholder cards while fetching from Supabase
+- **Error handling** — dismissible error banners for failed network requests
+- **Inline delete confirmation** — replaces browser `confirm()` with a Yes/No in-card prompt
+- **Responsive** — 3-column grid on desktop, 2-column on tablet, single column on mobile
 
 ## Tech Stack
 
-- React
-- Vite
-- JavaScript
+- [React 19](https://react.dev) + [Vite 7](https://vitejs.dev)
+- [Supabase](https://supabase.com) — Auth + PostgreSQL database
 - CSS (no UI framework)
-- localStorage (for data persistence)
+- Deployed on [Netlify](https://netlify.com)
 
 ## Project Structure
 
 ```
 src/
 ├── components/
-│   ├── DestinationCard.jsx   # Displays a single destination with edit/delete
-│   ├── DestinationForm.jsx   # Add and edit form (dual mode)
-│   └── SearchBar.jsx         # Live search input
+│   ├── AuthForm.jsx          # Sign in / sign up form
+│   ├── DestinationCard.jsx   # Card with visited toggle, inline delete confirm
+│   ├── DestinationForm.jsx   # Add/edit form with validation and scroll-into-view
+│   ├── ProtectedRoute.jsx    # Auth gate — shows AuthForm if no session
+│   └── SearchBar.jsx         # Live search input with clear button
+├── context/
+│   └── AuthContext.jsx       # Auth state, session persistence, signIn/signOut
+├── lib/
+│   └── supabase.js           # Supabase client (reads from env vars)
 ├── utils/
-│   └── storage.js            # localStorage CRUD helpers
-├── App.jsx                   # Root component, state management
-├── App.css                   # App styles and responsive layout
+│   └── storage.js            # Supabase CRUD — getDestinations, add, update, delete, toggleVisited
+├── App.jsx                   # Root component, state management, handlers
+├── App.css                   # All app styles
 ├── index.css                 # Base reset and typography
-└── main.jsx                  # React entry point
+└── main.jsx                  # Entry point — AuthProvider + ProtectedRoute wrappers
 ```
 
-## Data Structure
+## Database Schema
 
-Each destination is stored as an object in a JSON array under the key `travelWishlist`:
-
-```js
-{
-  id: "1234567890",
-  name: "Kyoto",
-  country: "Japan",
-  category: "Culture",
-  rating: 4,             // 1–5 or null if unrated
-  notes: "Cherry blossom season",
-  visited: false,
-  createdAt: "2026-03-09T..."
-}
+```sql
+create table destinations (
+  id         uuid primary key default gen_random_uuid(),
+  user_id    uuid references auth.users(id) on delete cascade not null,
+  name       text not null,
+  country    text not null,
+  category   text,
+  rating     integer check (rating >= 1 and rating <= 5),
+  notes      text,
+  visited    boolean not null default false,
+  created_at timestamptz not null default now()
+);
 ```
+
+Row Level Security is enabled with policies scoped to `auth.uid()` on all four operations (SELECT, INSERT, UPDATE, DELETE).
 
 ## Getting Started
 
+### 1. Clone and install
+
 ```bash
 npm install
+```
+
+### 2. Create a Supabase project
+
+- Go to [supabase.com](https://supabase.com) and create a project
+- Run the SQL above in the SQL editor
+- Enable Row Level Security and add the four policies (see `transcripts/`)
+
+### 3. Set environment variables
+
+Create `.env.local` in the project root:
+
+```
+VITE_SUPABASE_URL=your_project_url
+VITE_SUPABASE_ANON_KEY=your_anon_key
+```
+
+Both values are in your Supabase dashboard under **Project Settings → API**.
+
+### 4. Run
+
+```bash
 npm run dev
 ```
 
 App runs at `http://localhost:5173`
 
-## Future Improvements
+## Deployment (Netlify)
 
-- Mark destinations as visited with a toggle
-- Sort destinations by rating or date added
-- Filter by category
+1. Push the repo to GitHub
+2. Connect the repo in Netlify
+3. Add `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` in **Site configuration → Environment variables**
+4. In Supabase → **Authentication → URL Configuration**, set your Netlify domain as Site URL and add it to Redirect URLs
+
+The `netlify.toml` in the repo root handles build config automatically.
+
+## Security Notes
+
+- The Supabase `anon` key is safe to include in frontend code — it is designed to be public
+- Data security is enforced server-side by Row Level Security, not by key secrecy
+- Never use or expose the `service_role` key in frontend code — it bypasses all RLS policies
+- `.env.local` is gitignored and must be set separately in Netlify's environment variables
