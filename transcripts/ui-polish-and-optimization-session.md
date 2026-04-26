@@ -159,3 +159,20 @@ Added `formRef = useRef(null)` to `DestinationForm`. Inside the `useEffect` that
 - **Optimistic visited toggle** — state updates instantly, error shown only if Supabase call fails
 - **`useMemo` for filter** — genuinely prevents work on unrelated renders (`editingDestination`, `loading`, `error` changes)
 - **`SkeletonCard` outside `App`** — critical for correctness; components defined inside other components lose identity on every render
+
+- ## Transcript Highlights
+
+### 1. Fixing a false success bug in form submission
+During form validation, the UI showed “Destination added!” even when a duplicate entry was blocked. I traced this to the form setting success before checking the result of the async handler. I refactored the handlers to return booleans and awaited the result before updating UI state. This improved both correctness and user feedback.
+
+### 2. Replacing window.confirm with inline confirmation
+Initially, delete actions used `window.confirm()`, which felt disruptive and inconsistent with the UI. I replaced it with an inline confirmation state inside each card, allowing users to confirm deletion without leaving context. This significantly improved UX and made the app feel more modern.
+
+### 3. Preventing empty state flicker with proper loading logic
+The app briefly showed “no destinations” before data loaded. I introduced a dedicated `loading` state and structured rendering logic to prioritize loading before empty state. This eliminated misleading UI flashes and created a smoother experience.
+
+### 4. Using useMemo to optimize filtering
+Filtering logic was recalculating on every render, even when unrelated state changed. I wrapped the filter in `useMemo` with correct dependencies, ensuring it only recalculates when needed. This was a small but intentional performance optimization.
+
+### 5. Pushing back on over-engineering
+AI suggested adding more advanced optimizations like memoization and additional abstractions. I chose not to implement them because the app size didn’t justify the complexity. Keeping the code simple made it easier to maintain and debug.
